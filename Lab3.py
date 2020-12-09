@@ -6,7 +6,10 @@ import json, subprocess
 
 DEFAULT = 1
 PERSONALIZED = 2
-
+SEE_ALL = 3
+SEE_MP4 = 4
+TEST = 5
+EXIT = 6
 class MP4container:
     inp: str
     files: list
@@ -36,9 +39,22 @@ class MP4container:
         files = [i for i in os.listdir(path) if i != '.DS_Store' and i != '.vscode' ]  # ignore random files
         return [(s + 1, i) for (s, i) in enumerate(files)]
 
-    def print_files(self):
-        for file in self.files:
-            print('{} - {}'.format(file[0], file[1]))
+    def print_files(self,ext):
+        if ext == 'all':
+            for file in self.files:
+                print('{} - {}'.format(file[0], file[1]))
+        elif ext=='mp4':
+            for file in self.files:
+                if file[1].split('.')[1]==ext:
+                    print('{} - {}'.format(file[0], file[1]))
+        elif ext=='mp3':
+            for file in self.files:
+                if file[1].split('.')[1]==ext:
+                    print('{} - {}'.format(file[0], file[1]))
+        elif ext=='str':
+            for file in self.files:
+                if file[1].split('.')[1]==ext:
+                    print('{} - {}'.format(file[0], file[1]))
 
     def extractAudiofromVideo(self,dur,init):
         keep=str(input("Extract audio?[y/n]"))
@@ -47,7 +63,7 @@ class MP4container:
     
             
     def videosettings(self):
-        self.print_files()
+        self.print_files('mp4')
         index = int(input("Indicate video track:"))
         self.inp=self.files[index-1][1]
         x = str(input("You want to cut the video?[y/n]"))
@@ -70,9 +86,14 @@ class MP4container:
         self.video = output #change input dir to work with the cutted video
     
     def audiosettings(self):
-        self.print_files()
-        index= str(input("Enter audio track to include in mp4 container:\n"))
+        self.print_files('mp3')
+        index= int(input("Enter audio track to include in mp4 container:\n"))
         self.mono = self.files[index-1][1]
+        if self.monol == None:
+            index= int(input("Enter another audio track to include in mp4 container:\n 0-To not add more"))
+            if index>0:
+                self.mono = self.files[index-1][1]
+
         
     def extractMonoTrack(self, codec = 'mp3', lowerbitrate=True, dur = '00:01:00', init = '00:00:00'):
         name = self.inp.split('.')
@@ -85,8 +106,8 @@ class MP4container:
             os.system(command)  
 
     def subtitlesettings(self):
-        self.print_files()
-        index = str(input("Enter the subtitle track to include in mp4 container:"))
+        self.print_files(ext='str')
+        index = int(input("Enter the subtitle track to include in mp4 container:"))
         self.setsubtitles(self.files[index-1][1])
 
     def setsubtitles(self,name=None):
@@ -127,9 +148,16 @@ class MP4container:
     
 
 if __name__ == "__main__": 
-    var = int(input("[1] Default mp4 (BBB)\n [2]Personalized"))
     x = MP4container()
-    x.finalContainer(var)
+    var = int(input("[1] Add default mp4 (BBB) to folder \n[2]Add personalized mp4 to folder\n[3]Display Folder files\n[4]Display MP4 Containers\n[5]Testing"))
+    if var == SEE_ALL:
+        x.print_files('all')
+    elif var == SEE_MP4:
+        x.print_files('mp4')
+    elif var == TEST:
+        print('building')
+    else:
+        x.finalContainer(var)
   
         
            
